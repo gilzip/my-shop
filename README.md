@@ -1,5 +1,7 @@
 # my-shop
 
+Hello gil
+
 This project was generated with [`@vendure/create`](https://github.com/vendurehq/vendure/tree/master/packages/create).
 
 Useful links:
