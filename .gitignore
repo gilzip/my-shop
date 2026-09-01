@@ -1,6 +1,28 @@
-node_modules
-dist
-admin-ui
-static/assets
-static/email/test-emails
+# Dependencies
+node_modules/
+dist/
 .vendure/
+admin-ui/
+
+# Static/generated assets
+static/assets/
+static/email/test-emails/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+
+# Local database / caches
+*.sqlite
+*.sqlite3
