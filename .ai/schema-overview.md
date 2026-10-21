@@ -2,12 +2,12 @@
 
 Living reference of the actual database schema for this project. Maintained by the **DBA** stage of the DevSDLC pipeline — updated every time a feature's `schema-execution.md` changes the schema, so this file should always reflect what's really in the database, not just what was originally scaffolded.
 
-## Status as of 2026-10-21 (updated after `back-in-stock-waitlist`)
+## Status as of 2026-10-21 (updated after `order-gift-message`)
 
 - **DB engine**: `better-sqlite3` (SQLite), file at `vendure.sqlite`, configured in `src/vendure-config.ts` (`dbConnectionOptions`).
 - **Migrations**: `synchronize: false`. `src/migrations/` contains six applied migrations (see Custom additions below).
 - **Custom entities**: one - `WaitlistEntry` (table `waitlist_entry`), the first, added by `src/plugins/back-in-stock-waitlist/`. The other custom plugin, `order-self-cancellation`, adds no table.
-- **customFields**: five fields so far — `ProductVariant.internalNote`, `Customer.GilTest`, `Customer.internalNote`, `Payment.gil_payment`, `Customer.dror_cust` (see Custom additions below).
+- **customFields**: six fields so far — `ProductVariant.internalNote`, `Customer.GilTest`, `Customer.internalNote`, `Payment.gil_payment`, `Customer.dror_cust`, `Order.giftMessage` (the only **public** one; see Custom additions below).
 - **Registered plugins**: GraphiqlPlugin, AssetServerPlugin, DefaultSchedulerPlugin, DefaultJobQueuePlugin, DefaultSearchPlugin, EmailPlugin, DashboardPlugin — all stock/official, none add project-specific tables.
 - **Conclusion**: the schema is otherwise **100% stock `@vendure/core` 3.7.2**, with five custom fields and one custom table added via the pipeline below. No indexes were added for the five custom fields — none of their access patterns call for one. The one index that exists is the unique index on `waitlist_entry`.
 
@@ -90,6 +90,7 @@ Living reference of the actual database schema for this project. Maintained by t
 | `customer` | `customFieldsInternalnote` (config name: `internalNote`) | `TEXT` | yes | no — absent from Shop API schema entirely (independently confirmed via live GraphQL introspection) | [`customer-gil-tzipori-field/schema-execution.md`](work/customer-gil-tzipori-field/schema-execution.md) |
 | `payment` | `customFieldsGil_payment` (config name: `gil_payment`) | `INTEGER` | yes, `DEFAULT (99999)` at the DB column level | no — hidden from Shop API reads and writes ([`protect-internal-custom-fields`](work/protect-internal-custom-fields/architecture.md)) | [`payment-gil-payment-field/schema-execution.md`](work/payment-gil-payment-field/schema-execution.md) |
 | `customer` | `customFieldsDror_cust` (config name: `dror_cust`) | `TEXT` | yes, no default | no — hidden from Shop API reads and writes ([`protect-internal-custom-fields`](work/protect-internal-custom-fields/architecture.md)) | [`customer-dror-cust-field/schema-execution.md`](work/customer-dror-cust-field/schema-execution.md) |
+| `order` | `customFieldsGiftmessage` (config name: `giftMessage`) | `TEXT` | yes, no default (existing orders stay `NULL`) | **yes — deliberately public** (`public: true`): the customer writes it on the active order and reads it on their own orders; max 200 graphemes enforced by `validate`, not by the column | [`order-gift-message/schema-execution.md`](work/order-gift-message/schema-execution.md) |
 
 ### Custom table: `waitlist_entry` (first custom entity)
 
@@ -104,7 +105,7 @@ Index: `IDX_8d540fc72938882dfce2138838`, **UNIQUE** on `(productVariantId, email
 
 A row means "still waiting"; a notified or removed person has no row, so there is no status column. Introduced by [`back-in-stock-waitlist/schema-execution.md`](work/back-in-stock-waitlist/schema-execution.md).
 
-Migrations: `src/migrations/1787489491389-AddProductVariantInternalNote.ts`, `src/migrations/1787549554034-AddCustomerGilTest.ts`, `src/migrations/1787641335045-AddCustomerInternalNote.ts`, `src/migrations/1787813335513-AddPaymentGilPayment.ts`, `src/migrations/1787823937827-AddCustomerDrorCust.ts`, `src/migrations/1792580616387-AddWaitlistEntry.ts`.
+Migrations: `src/migrations/1787489491389-AddProductVariantInternalNote.ts`, `src/migrations/1787549554034-AddCustomerGilTest.ts`, `src/migrations/1787641335045-AddCustomerInternalNote.ts`, `src/migrations/1787813335513-AddPaymentGilPayment.ts`, `src/migrations/1787823937827-AddCustomerDrorCust.ts`, `src/migrations/1792580616387-AddWaitlistEntry.ts`, `src/migrations/1792591766697-AddOrderGiftMessage.ts` (its `down` was hand-corrected by the DBA; see that feature's `schema-execution.md`).
 
 **Visibility rule (all custom fields):** `customFields` in `vendure-config.ts` is wrapped in `internalByDefault()` (`src/custom-fields/internal-by-default.ts`). A field without `public` is hidden from the Shop API and gets a Shop-API write guard on its `validate` hook. Exposing a field to customers requires an explicit `public: true`. Visibility is GraphQL-only and never needs a migration.
 
