@@ -21,6 +21,8 @@ import { freeShippingIsraelChecker } from './shipping-methods/free-shipping-isra
 import { isFirstOrderCondition } from './promotions/is-first-order-condition';
 import { buyXGetYDiscountAction } from './promotions/buy-x-get-y-discount-action';
 import { OrderSelfCancellationPlugin } from './plugins/order-self-cancellation/order-self-cancellation.plugin';
+import { BackInStockWaitlistPlugin } from './plugins/back-in-stock-waitlist/back-in-stock-waitlist.plugin';
+import { backInStockEmailHandler } from './plugins/back-in-stock-waitlist/back-in-stock-email-handler';
 import { internalByDefault } from './custom-fields/internal-by-default';
 
 const IS_DEV = process.env.APP_ENV === 'dev';
@@ -147,6 +149,7 @@ export const config: VendureConfig = {
     }),
     plugins: [
         OrderSelfCancellationPlugin,
+        BackInStockWaitlistPlugin,
         GraphiqlPlugin.init(),
         AssetServerPlugin.init({
             route: 'assets',
@@ -163,7 +166,8 @@ export const config: VendureConfig = {
             devMode: true,
             outputPath: path.join(__dirname, '../static/email/test-emails'),
             route: 'mailbox',
-            handlers: defaultEmailHandlers,
+            // Spread: the array is replaced, not merged, so the defaults must be listed explicitly.
+            handlers: [...defaultEmailHandlers, backInStockEmailHandler],
             templateLoader: new FileBasedTemplateLoader(path.join(__dirname, '../static/email/templates')),
             globalTemplateVars: {
                 // The following variables will change depending on your storefront implementation.

@@ -2,14 +2,14 @@
 
 Living reference of the actual database schema for this project. Maintained by the **DBA** stage of the DevSDLC pipeline — updated every time a feature's `schema-execution.md` changes the schema, so this file should always reflect what's really in the database, not just what was originally scaffolded.
 
-## Status as of 2026-08-27 (updated after `customer-dror-cust-field`)
+## Status as of 2026-10-21 (updated after `back-in-stock-waitlist`)
 
 - **DB engine**: `better-sqlite3` (SQLite), file at `vendure.sqlite`, configured in `src/vendure-config.ts` (`dbConnectionOptions`).
-- **Migrations**: `synchronize: false`. `src/migrations/` contains five applied migrations (see Custom additions below).
-- **Custom entities**: none. `src/plugins/` is empty.
+- **Migrations**: `synchronize: false`. `src/migrations/` contains six applied migrations (see Custom additions below).
+- **Custom entities**: one - `WaitlistEntry` (table `waitlist_entry`), the first, added by `src/plugins/back-in-stock-waitlist/`. The other custom plugin, `order-self-cancellation`, adds no table.
 - **customFields**: five fields so far — `ProductVariant.internalNote`, `Customer.GilTest`, `Customer.internalNote`, `Payment.gil_payment`, `Customer.dror_cust` (see Custom additions below).
 - **Registered plugins**: GraphiqlPlugin, AssetServerPlugin, DefaultSchedulerPlugin, DefaultJobQueuePlugin, DefaultSearchPlugin, EmailPlugin, DashboardPlugin — all stock/official, none add project-specific tables.
-- **Conclusion**: the schema is otherwise **100% stock `@vendure/core` 3.7.2**, with five custom fields added via the pipeline below. No indexes were added for any of them — none of the five access patterns call for one.
+- **Conclusion**: the schema is otherwise **100% stock `@vendure/core` 3.7.2**, with five custom fields and one custom table added via the pipeline below. No indexes were added for the five custom fields — none of their access patterns call for one. The one index that exists is the unique index on `waitlist_entry`.
 
 ---
 
@@ -91,6 +91,19 @@ Living reference of the actual database schema for this project. Maintained by t
 | `payment` | `customFieldsGil_payment` (config name: `gil_payment`) | `INTEGER` | yes, `DEFAULT (99999)` at the DB column level | not set — currently exposed to Shop API (no `public: false` was requested for this field; consistent with the business requirement, which didn't ask for it to be hidden) | [`payment-gil-payment-field/schema-execution.md`](work/payment-gil-payment-field/schema-execution.md) |
 | `customer` | `customFieldsDror_cust` (config name: `dror_cust`) | `TEXT` | yes, no default | not set — currently exposed to Shop API (not requested to be hidden) | [`customer-dror-cust-field/schema-execution.md`](work/customer-dror-cust-field/schema-execution.md) |
 
-Migrations: `src/migrations/1787489491389-AddProductVariantInternalNote.ts`, `src/migrations/1787549554034-AddCustomerGilTest.ts`, `src/migrations/1787641335045-AddCustomerInternalNote.ts`, `src/migrations/1787813335513-AddPaymentGilPayment.ts`, `src/migrations/1787823937827-AddCustomerDrorCust.ts`.
+### Custom table: `waitlist_entry` (first custom entity)
+
+| Column | Type | Nullable | Notes |
+|---|---|---|---|
+| `id` | `integer`, primary key, autoincrement | no | |
+| `createdAt`, `updatedAt` | `datetime`, `DEFAULT (datetime('now'))` | no | from `VendureEntity` |
+| `productVariantId` | `integer` | no | plain id column, **no foreign key** (variants are soft-deleted, so a cascade would never fire; rows are cleared by `ProductVariantEvent('deleted')`) |
+| `emailAddress` | `varchar` | no | stored trimmed and lower-cased |
+
+Index: `IDX_8d540fc72938882dfce2138838`, **UNIQUE** on `(productVariantId, emailAddress)`. It enforces one row per address per variant, and its leading column serves the two real access patterns (who waits for variant X, how many wait for X). No other index: there is no query by email alone.
+
+A row means "still waiting"; a notified or removed person has no row, so there is no status column. Introduced by [`back-in-stock-waitlist/schema-execution.md`](work/back-in-stock-waitlist/schema-execution.md).
+
+Migrations: `src/migrations/1787489491389-AddProductVariantInternalNote.ts`, `src/migrations/1787549554034-AddCustomerGilTest.ts`, `src/migrations/1787641335045-AddCustomerInternalNote.ts`, `src/migrations/1787813335513-AddPaymentGilPayment.ts`, `src/migrations/1787823937827-AddCustomerDrorCust.ts`, `src/migrations/1792580616387-AddWaitlistEntry.ts`.
 
 **Note on `customer.customFieldsGiltest`**: this column and its migration existed prior to this DBA update but were never recorded in this living document — a documentation gap, now closed. Its Shop API exposure is a known, separately-tracked bug (not introduced or fixed by the `customer-gil-tzipori-field` feature); see that feature's `technical-discovery.md` and `architecture.md` for details. This file does not carry a "fixed" status for it — check the actual `vendure-config.ts` for the current state of that field's `public` flag rather than relying on this note once that fix lands.

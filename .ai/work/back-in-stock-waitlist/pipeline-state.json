@@ -1,0 +1,91 @@
+{
+ "feature": "back-in-stock-waitlist",
+ "title": "Back-in-stock waitlist",
+ "stages": [
+  "done",
+  "done",
+  "done",
+  "done",
+  "done",
+  "done"
+ ],
+ "log": [
+  {
+   "t": "14:39:39",
+   "m": "Run complete"
+  },
+  {
+   "t": "14:39:12",
+   "m": "You approved Reviewer"
+  },
+  {
+   "t": "14:38:53",
+   "m": "Reviewer finished (verdict PASS) - waiting for your approval"
+  },
+  {
+   "t": "14:04:53",
+   "m": "Reviewer agent started"
+  },
+  {
+   "t": "14:04:53",
+   "m": "You approved DBA"
+  },
+  {
+   "t": "14:04:38",
+   "m": "DBA finished - waiting for your approval"
+  },
+  {
+   "t": "13:59:45",
+   "m": "DBA agent started"
+  },
+  {
+   "t": "13:59:45",
+   "m": "You approved Developer"
+  },
+  {
+   "t": "13:59:08",
+   "m": "Developer finished - waiting for your approval"
+  },
+  {
+   "t": "13:23:03",
+   "m": "Developer agent started"
+  },
+  {
+   "t": "13:23:03",
+   "m": "You approved Software Architect"
+  },
+  {
+   "t": "13:22:38",
+   "m": "Software Architect finished - waiting for your approval"
+  },
+  {
+   "t": "13:16:57",
+   "m": "Software Architect agent started"
+  },
+  {
+   "t": "13:16:57",
+   "m": "You approved Technical PM"
+  },
+  {
+   "t": "13:15:55",
+   "m": "Technical PM finished - waiting for your approval"
+  },
+  {
+   "t": "13:11:04",
+   "m": "Technical PM agent started"
+  },
+  {
+   "t": "13:11:04",
+   "m": "You approved Business PM"
+  },
+  {
+   "t": "13:07:20",
+   "m": "Business PM finished - waiting for your approval"
+  },
+  {
+   "t": "13:07:20",
+   "m": "Run started"
+  }
+ ],
+ "done": true
+}
