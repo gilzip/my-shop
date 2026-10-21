@@ -18,10 +18,18 @@ This project was generated with `@vendure/create`.
 - Do not commit `.env` values or generated runtime data.
 - Do not use `dbConnectionOptions.synchronize: true` for production data.
 
+## Custom Fields
+
+- Custom fields are hidden from customers by default. `customFields` in `vendure-config.ts` is wrapped in `internalByDefault()`, so a field without `public` gets `public: false` plus a guard that rejects Shop API writes.
+- Expose a field to customers only with an explicit `public: true`, and say why in its `description`.
+- A plugin that adds custom fields in its own `configuration` hook bypasses `internalByDefault()`. Set `public` explicitly there.
+- Do not use `internal: true` or `readonly: true` to hide a field from customers: they also hide or lock the field for back-office staff.
+
 ## Commands
 
 - Start development: `npm run dev`
 - Build: `npm run build`
+- Unit tests: `npm test`
 
 ## Quality Checks
 
