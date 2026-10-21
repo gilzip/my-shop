@@ -24,6 +24,8 @@ import { OrderSelfCancellationPlugin } from './plugins/order-self-cancellation/o
 import { BackInStockWaitlistPlugin } from './plugins/back-in-stock-waitlist/back-in-stock-waitlist.plugin';
 import { backInStockEmailHandler } from './plugins/back-in-stock-waitlist/back-in-stock-email-handler';
 import { internalByDefault } from './custom-fields/internal-by-default';
+import { OrderGiftMessagePlugin } from './plugins/order-gift-message/order-gift-message.plugin';
+import { GIFT_MESSAGE_MAX, validateGiftMessage } from './plugins/order-gift-message/gift-message-rules';
 
 const IS_DEV = process.env.APP_ENV === 'dev';
 // PORT wins because hosting platforms inject it into the environment at runtime, and that
@@ -146,10 +148,27 @@ export const config: VendureConfig = {
                 }],
             },
         ],
+        Order: [
+            {
+                name: 'giftMessage',
+                type: 'text',
+                nullable: true,
+                // Deliberately public: the ordering customer writes it at checkout and sees it on their order.
+                public: true,
+                label: [{ languageCode: LanguageCode.en, value: 'Gift message' }],
+                description: [{
+                    languageCode: LanguageCode.en,
+                    value: `Customer-facing: a personal note to the gift recipient, max ${GIFT_MESSAGE_MAX} characters. ` +
+                        'Public because the customer writes it at checkout and sees it on their order.',
+                }],
+                validate: validateGiftMessage,
+            },
+        ],
     }),
     plugins: [
         OrderSelfCancellationPlugin,
         BackInStockWaitlistPlugin,
+        OrderGiftMessagePlugin,
         GraphiqlPlugin.init(),
         AssetServerPlugin.init({
             route: 'assets',

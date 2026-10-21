@@ -1,0 +1,103 @@
+{
+ "feature": "order-gift-message",
+ "title": "Order gift message",
+ "stages": [
+  "done",
+  "done",
+  "done",
+  "done",
+  "done",
+  "done"
+ ],
+ "log": [
+  {
+   "t": "17:36:28",
+   "m": "Run complete"
+  },
+  {
+   "t": "17:36:28",
+   "m": "You approved Reviewer"
+  },
+  {
+   "t": "17:35:42",
+   "m": "Reviewer re-run after your decision: verdict PASS (22/22, 21/21, 22/22) - waiting for your approval"
+  },
+  {
+   "t": "17:34:42",
+   "m": "You chose option 1 in chat: accept Vendure's order-code access; update docs and re-run the review"
+  },
+  {
+   "t": "17:32:16",
+   "m": "Reviewer finished (verdict FAIL: Finding A needs a business decision) - waiting for your decision"
+  },
+  {
+   "t": "17:12:58",
+   "m": "Reviewer agent started"
+  },
+  {
+   "t": "17:12:58",
+   "m": "You approved DBA"
+  },
+  {
+   "t": "17:12:14",
+   "m": "DBA finished (down migration corrected) - waiting for your approval"
+  },
+  {
+   "t": "17:08:36",
+   "m": "DBA agent started"
+  },
+  {
+   "t": "17:08:36",
+   "m": "You approved Developer"
+  },
+  {
+   "t": "17:08:13",
+   "m": "Developer finished - waiting for your approval"
+  },
+  {
+   "t": "16:38:56",
+   "m": "Developer agent started"
+  },
+  {
+   "t": "16:38:56",
+   "m": "You approved Software Architect"
+  },
+  {
+   "t": "16:38:40",
+   "m": "Software Architect finished - storefront scope decision needed (a/b/c)"
+  },
+  {
+   "t": "16:36:52",
+   "m": "Software Architect agent started"
+  },
+  {
+   "t": "16:36:52",
+   "m": "You approved Technical PM"
+  },
+  {
+   "t": "16:36:09",
+   "m": "Technical PM finished - waiting for your approval"
+  },
+  {
+   "t": "16:34:15",
+   "m": "Technical PM agent started"
+  },
+  {
+   "t": "16:34:15",
+   "m": "You approved Business PM"
+  },
+  {
+   "t": "16:33:56",
+   "m": "Business PM finished - waiting for your approval"
+  },
+  {
+   "t": "16:33:24",
+   "m": "Business PM agent started"
+  },
+  {
+   "t": "16:33:03",
+   "m": "Run started"
+  }
+ ],
+ "done": true
+}
