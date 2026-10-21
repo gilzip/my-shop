@@ -8,7 +8,7 @@ Companion documents: [`.ai/schema-overview.md`](schema-overview.md) (tables/rela
 
 ## Status as of 2026-08-23 (updated after `free-shipping-israel` and `first-order-discount`)
 
-Core module set is 100% stock `@vendure/core` 3.7.2. Seven plugins are registered in `src/vendure-config.ts`, all official Vendure packages — no custom plugins exist yet (`src/plugins/` is empty). Three custom extensions are now registered directly as handler/checker/condition objects, not plugins: `applePaySimulatedHandler` (payment), `freeShippingIsraelChecker` (shipping), `isFirstOrderCondition` (promotions).
+Core module set is 100% stock `@vendure/core` 3.7.2. Seven plugins are registered in `src/vendure-config.ts`, all official Vendure packages — one custom plugin exists, `OrderSelfCancellationPlugin` in `src/plugins/` (see Custom additions). Three custom extensions are registered directly as handler/checker/condition objects, not plugins: `applePaySimulatedHandler` (payment), `freeShippingIsraelChecker` (shipping), `isFirstOrderCondition` (promotions).
 
 ---
 
@@ -120,7 +120,7 @@ This project: `bufferUpdates: false`, `indexStockStatus: true`.
 
 ## Custom additions
 
-No custom plugins exist in `src/plugins/` — every addition so far is a small object registered directly into an existing module's extension-point array, not a new module:
+One custom plugin now exists (`src/plugins/order-self-cancellation/`, the project's first). Every other addition so far is a small object registered directly into an existing module's extension-point array, not a new module:
 
 | Module | Extension | Introduced by |
 |---|---|---|
@@ -128,3 +128,4 @@ No custom plugins exist in `src/plugins/` — every addition so far is a small o
 | Shipping | `freeShippingIsraelChecker` (`ShippingEligibilityChecker`, code `free-shipping-israel-checker`) | [`free-shipping-israel/technical-discovery.md`](work/free-shipping-israel/technical-discovery.md) |
 | Pricing, Tax & Promotions | `isFirstOrderCondition` (`PromotionCondition`, code `is_first_order`) | [`first-order-discount/technical-discovery.md`](work/first-order-discount/technical-discovery.md) |
 | Pricing, Tax & Promotions | `buyXGetYDiscountAction` (`PromotionItemAction`, code `buy_x_get_y_discount`) - reuses the built-in `buyXGetYFreeCondition` unchanged | [`buy-x-get-y-discount/technical-discovery.md`](work/buy-x-get-y-discount/technical-discovery.md) |
+| Order & Commerce | **`OrderSelfCancellationPlugin`** (custom plugin) — adds the Shop API mutation `cancelMyOrder`; built on `OrderService.cancelOrder` / `cancelPayment` / `refundOrder` and `orderByCodeAccessStrategy`; no new entity or table | [`order-self-cancellation/technical-discovery.md`](work/order-self-cancellation/technical-discovery.md) |

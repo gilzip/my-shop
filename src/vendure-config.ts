@@ -20,6 +20,8 @@ import { applePaySimulatedHandler } from './payment-methods/apple-pay-simulated-
 import { freeShippingIsraelChecker } from './shipping-methods/free-shipping-israel-checker';
 import { isFirstOrderCondition } from './promotions/is-first-order-condition';
 import { buyXGetYDiscountAction } from './promotions/buy-x-get-y-discount-action';
+import { OrderSelfCancellationPlugin } from './plugins/order-self-cancellation/order-self-cancellation.plugin';
+import { internalByDefault } from './custom-fields/internal-by-default';
 
 const IS_DEV = process.env.APP_ENV === 'dev';
 // PORT wins because hosting platforms inject it into the environment at runtime, and that
@@ -77,7 +79,9 @@ export const config: VendureConfig = {
     },
     // When adding or altering custom field definitions, the database will
     // need to be updated. See the "Migrations" section in README.md.
-    customFields: {
+    // internalByDefault: a field without `public` is hidden from the Shop API;
+    // exposing one to customers takes an explicit `public: true` (see AGENTS.md).
+    customFields: internalByDefault({
         ProductVariant: [
             {
                 name: 'internalNote',
@@ -96,10 +100,11 @@ export const config: VendureConfig = {
                 name: 'GilTest',
                 type: 'int',
                 nullable: true,
+                public: false,
                 label: [{ languageCode: LanguageCode.en, value: 'GilTest (pipeline test field)' }],
                 description: [{
                     languageCode: LanguageCode.en,
-                    value: 'Internal pipeline test field - no business meaning.',
+                    value: 'Internal pipeline test field - no business meaning. Never shown to customers.',
                 }],
             },
             {
@@ -117,10 +122,11 @@ export const config: VendureConfig = {
                 name: 'dror_cust',
                 type: 'text',
                 nullable: true,
+                public: false,
                 label: [{ languageCode: LanguageCode.en, value: 'dror_cust (pipeline test field)' }],
                 description: [{
                     languageCode: LanguageCode.en,
-                    value: 'Internal pipeline test field - no default, no backfill.',
+                    value: 'Internal pipeline test field - no default, no backfill. Never shown to customers.',
                 }],
             },
         ],
@@ -130,15 +136,17 @@ export const config: VendureConfig = {
                 type: 'int',
                 defaultValue: 99999,
                 nullable: true,
+                public: false,
                 label: [{ languageCode: LanguageCode.en, value: 'gil_payment (pipeline test field)' }],
                 description: [{
                     languageCode: LanguageCode.en,
-                    value: 'Internal pipeline test field - defaults to 99999, no business meaning.',
+                    value: 'Internal pipeline test field - defaults to 99999, no business meaning. Never shown to customers.',
                 }],
             },
         ],
-    },
+    }),
     plugins: [
+        OrderSelfCancellationPlugin,
         GraphiqlPlugin.init(),
         AssetServerPlugin.init({
             route: 'assets',

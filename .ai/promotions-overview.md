@@ -2,7 +2,7 @@
 
 Reference document analyzing every promotion condition and action available in this project, grounded directly in the real installed `@vendure/core` source (`node_modules/@vendure/core/dist/config/promotion/`) and this project's own custom additions — not from general Vendure documentation, since exact `code` strings and behavior are version-specific and two were found to differ from what a name would suggest (see the correction note at the end).
 
-Companion to [`.ai/modules-overview.md`](modules-overview.md) (which lists the Promotions module at a higher level) — this document goes one level deeper, into the actual condition/action catalog.
+Companion to [`.ai/modules-overview.md`](modules-overview.md)נץנ (which lists the Promotions module at a higher level) — this document goes one level deeper, into the actual condition/action catalog.
 
 ## How a Promotion works, in this codebase's own terms
 

@@ -9,7 +9,7 @@ This is a **top-level operation map** (Query/Mutation names, grouped by domain) 
 ## Status as of 2026-08-23
 
 - **Admin API** (`/admin-api`): 82 top-level queries, 179 top-level mutations.
-- **Shop API** (`/shop-api`): 19 top-level queries, 32 top-level mutations — deliberately a small subset of Admin, since it's the customer-facing surface.
+- **Shop API** (`/shop-api`): 19 top-level queries, 33 top-level mutations (32 stock + the custom `cancelMyOrder`, added by `order-self-cancellation`) — deliberately a small subset of Admin, since it's the customer-facing surface.
 - Every custom field with `public: false` (e.g. `ProductVariant.internalNote`) is excluded from the Shop API at the schema level — this doesn't change the *operation* list above, but changes what fields are reachable through the operations that do exist (e.g. `products`/`product` on the Shop API).
 
 ---
@@ -78,7 +78,7 @@ This is a **top-level operation map** (Query/Mutation names, grouped by domain) 
 
 | Queries | Mutations |
 |---|---|
-| `activeOrder`, `order`, `orderByCode`, `nextOrderStates`, `eligibleShippingMethods`, `eligiblePaymentMethods`, `activePaymentMethods`, `activeShippingMethods` | `addItemToOrder`, `addItemsToOrder`, `adjustOrderLine`, `removeOrderLine`, `removeAllOrderLines`, `applyCouponCode`, `removeCouponCode`, `setOrderShippingAddress`, `unsetOrderShippingAddress`, `setOrderBillingAddress`, `unsetOrderBillingAddress`, `setOrderShippingMethod`, `setCustomerForOrder`, `setCurrencyCodeForOrder`, `setOrderCustomFields`, `transitionOrderToState`, `addPaymentToOrder` |
+| `activeOrder`, `order`, `orderByCode`, `nextOrderStates`, `eligibleShippingMethods`, `eligiblePaymentMethods`, `activePaymentMethods`, `activeShippingMethods` | `addItemToOrder`, `addItemsToOrder`, `adjustOrderLine`, `removeOrderLine`, `removeAllOrderLines`, `applyCouponCode`, `removeCouponCode`, `setOrderShippingAddress`, `unsetOrderShippingAddress`, `setOrderBillingAddress`, `unsetOrderBillingAddress`, `setOrderShippingMethod`, `setCustomerForOrder`, `setCurrencyCodeForOrder`, `setOrderCustomFields`, `transitionOrderToState`, `addPaymentToOrder`, **`cancelMyOrder`** *(custom — see Custom additions)* |
 
 ### Account & auth
 
@@ -90,7 +90,7 @@ This is a **top-level operation map** (Query/Mutation names, grouped by domain) 
 
 ## Notable observations
 
-- **Shop API is a strict, intentionally small subset** — 51 total operations vs. Admin's 261. Nearly every Shop mutation exists for the customer's own cart/account; there is no bulk/admin-style operation anywhere in it.
+- **Shop API is a strict, intentionally small subset** — 52 total operations (51 stock + the custom `cancelMyOrder`) vs. Admin's 261. Nearly every Shop mutation exists for the customer's own cart/account; there is no bulk/admin-style operation anywhere in it.
 - **Draft orders are an Admin-only concept** (`createDraftOrder` and its whole `*DraftOrder*` family) — used for admin-created/phone orders, not exposed to customers, who instead build up `activeOrder` through the Shop API's own add/adjust/remove operations.
 - **`authenticate`, `login`, `logout` exist on both APIs** but scope to different principals — Administrator sessions on Admin, Customer sessions on Shop.
 - **Assign/remove-from-channel mutations** (18 of them) are the multi-channel/multi-storefront mechanism — worth knowing about before assuming a new "channel scoping" feature needs custom code; it likely doesn't.
@@ -98,5 +98,7 @@ This is a **top-level operation map** (Query/Mutation names, grouped by domain) 
 ## Custom additions
 
 _(none yet at the operation level — `ProductVariant.internalNote` from the `variant-internal-note` feature changes what's reachable through the *existing* `productVariant`/`productVariants`/`updateProductVariant` operations on the Admin API, and is absent from the Shop API's `product`/`products`, but it did not add or remove any top-level operation. This section will list new operations if a future feature adds one, with a pointer to that feature's `architecture.md`.)_
+
+**First custom operation: `cancelMyOrder(orderCode: String!): CancelMyOrderResult!` (Shop API only)**, added by the `order-self-cancellation` feature ([`architecture.md`](work/order-self-cancellation/architecture.md), [`implementation.md`](work/order-self-cancellation/implementation.md)). Lets a customer (logged in, or a guest holding the order code) cancel their own order within 1 hour of `orderPlacedAt`, provided it has not shipped; an Authorized payment is voided and a Settled one is refunded in the same transaction. Returns the union `Order | CancelMyOrderError` (reasons: `NOT_CANCELLABLE`, `WINDOW_EXPIRED`, `ALREADY_SHIPPED`); an unknown or someone else's order code yields `FORBIDDEN` (same anti-enumeration behaviour as `orderByCode`). It does **not** exist on the Admin API, whose own `cancelOrder` is unchanged. Implemented in `src/plugins/order-self-cancellation/`.
 
 `Customer.internalNote` (from the `customer-gil-tzipori-field` feature, see [`architecture.md`](work/customer-gil-tzipori-field/architecture.md)) is the same shape of change: reachable through the *existing* `customer`/`customers`/`updateCustomer` operations on the Admin API only, `public: false` so it's absent from the Shop API's `customer`-facing `updateCustomer`/`activeCustomer`/`me`. No top-level operation added or removed.

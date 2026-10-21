@@ -7,8 +7,9 @@ export const freeShippingIsraelChecker = new ShippingEligibilityChecker({
         value: 'Eligible only for orders shipping to Israel with a subtotal at or above the configured minimum',
     }],
     args: {
-        // Minor units (agorot) - 20_000 = 200 ILS. Vendure stores all money
-        // values in minor units, matching this project's other shipping rates.
+        // Minor units of the channel's currency. The default channel is USD, so
+        // 20_000 = $200. Vendure stores all money values in minor units, matching
+        // this project's other shipping rates.
         orderMinimum: {
             type: 'int',
             defaultValue: 20_000,

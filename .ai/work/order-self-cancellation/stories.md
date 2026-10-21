@@ -88,6 +88,8 @@ A hard security/business boundary, not a tunable preference.
 
 **Acceptance criteria**
 - Given an order belonging to a different customer, when the requesting customer attempts to cancel it (e.g. by guessing or otherwise obtaining its id), then the request is rejected the same way as if the order didn't exist - no information about the order's existence or state should leak to a non-owner.
+- Given an order belonging to a **registered** customer, when a caller who is **not logged in** (or is logged in as someone else) supplies that order's code, then the request is rejected the same way - holding the code is not enough for a registered customer's order. *(Added after the first independent review found an anonymous caller could cancel such an order.)*
+- Given an order placed by a **guest** (no registered account), when the person holding that order's code requests cancellation within the window, then it is allowed - the code is a guest's only credential.
 
 **Business rules**
 - Ownership is determined the same way the rest of the Shop API already does it for the `order(id)` query - no new identity rule invented for this feature.

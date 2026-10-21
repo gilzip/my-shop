@@ -53,6 +53,25 @@ Identifying the order **by `orderCode` (not a bare id)** is a deliberate consequ
 
 **Permission**: `@Allow(Permission.Owner)` on the mutation, same as `orderByCode`/`transitionOrderToState` - the resolver's own logic (step 2) does the real per-order ownership check; `Permission.Owner` just admits any authenticated-or-anonymous customer session to attempt the mutation at all.
 
+## Correction made at the Developer stage (verified against real source)
+
+The Proposed Design above says to call `refundOrder` for every payment in `Settled` **or** `Authorized` state. That is wrong for `Authorized`:
+
+- `OrderService.refundOrder` returns `RefundOrderStateError` when the order is in `AddingItems`, `ArrangingPayment` or `PaymentAuthorized` (`order.service.js:1545-1548`). An order with only an Authorized payment is exactly in `PaymentAuthorized`.
+- An Authorized payment has not captured any money, so the correct operation is to **void** it: `OrderService.cancelPayment(ctx, paymentId)` → `PaymentService.cancelPayment`, which calls the handler's `cancelPayment` hook and moves the payment to `Cancelled` (`payment.service.js:151-168`). This project's `dummyPaymentHandler` and `applePaySimulatedHandler` both implement `cancelPayment`.
+- Only `Settled` payments are refunded via `refundOrder(ctx, { paymentId, amount, reason })`. That call is permitted once the order has been moved to `Cancelled` (`Cancelled` is not in the rejected-state list), so the safe sequence is **cancel the order first, then handle each payment**: Authorized → `cancelPayment`, Settled → `refundOrder`.
+- Payments in any other state (`Declined`, `Error`, `Cancelled`) need nothing.
+
+Step 6 of the resolver guard sequence is therefore: after `cancelOrder` succeeds, for each payment — `Authorized` → void; `Settled` → refund the full amount. Any failure in either call still rolls the whole `@Transaction()` back (all-or-nothing, unchanged).
+
+Also confirmed: a plugin error result only needs a `__typename` equal to its GraphQL type name — Vendure's common `ErrorResult.__resolveType` returns `value.__typename` (`generate-resolvers.js:120-124`).
+
+## Correction made after the first review (ownership of registered customers' orders)
+
+The design above delegated ownership entirely to `orderByCodeAccessStrategy.canAccessOrder` and accepted, as "pre-existing `orderByCode` risk", that anyone holding an order code within 2 hours can identify (and cancel) the order. The independent review showed that is not acceptable for a **destructive** action on a **registered** customer's order: an anonymous session holding only the code cancelled such an order (review R10b). That reasoning only holds for *reading* an order, and for guests, who have no other identity.
+
+Final rule: `canAccessOrder` is still the first check (it is what admits a guest holding a guest order's code), and **in addition**, if the order has a linked registered user (`order.customer.user`), the caller must be that logged-in user (`idsAreEqual(ctx.activeUserId, order.customer.user.id)`), otherwise `FORBIDDEN`. Guest orders keep code-based access, since the code is their only credential. The "Risks" note below about guest/code access therefore now applies **only to guest orders**.
+
 ## Files to Create/Modify
 
 - **Create**: `src/plugins/order-self-cancellation/order-self-cancellation.plugin.ts` (the `@VendurePlugin` class, registering `shopApiExtensions`).

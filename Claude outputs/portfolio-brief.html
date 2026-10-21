@@ -1,0 +1,610 @@
+<title>רבעון ההחלטות</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700&family=Heebo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+  :root{
+    --bg:#F1F2ED;
+    --surface:#FFFFFF;
+    --surface-2:#E7E9E1;
+    --surface-3:#DEE1D6;
+    --ink:#1C2530;
+    --ink-muted:#5B6472;
+    --ink-faint:#8A9199;
+    --accent:#2E5F66;
+    --accent-soft:#DCE8E7;
+    --highlight:#B5741F;
+    --highlight-soft:#F3E4CC;
+    --status-good:#3F7D4F;
+    --status-good-soft:#DEEBE0;
+    --status-watch:#A6771E;
+    --status-watch-soft:#F1E6CE;
+    --status-risk:#A2402C;
+    --status-risk-soft:#F3DFD8;
+    --rule:#D3D6CB;
+    --shadow: 0 1px 2px rgba(28,37,48,.06), 0 8px 24px rgba(28,37,48,.05);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#12161B;
+      --surface:#1A2027;
+      --surface-2:#212832;
+      --surface-3:#2A323D;
+      --ink:#E8EAE5;
+      --ink-muted:#A2ABB6;
+      --ink-faint:#707A85;
+      --accent:#7FB8BE;
+      --accent-soft:#233336;
+      --highlight:#E0A85A;
+      --highlight-soft:#33291B;
+      --status-good:#7FC08F;
+      --status-good-soft:#20301F;
+      --status-watch:#E0B84F;
+      --status-watch-soft:#332C17;
+      --status-risk:#E08D77;
+      --status-risk-soft:#372220;
+      --rule:#333B45;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#12161B;
+    --surface:#1A2027;
+    --surface-2:#212832;
+    --surface-3:#2A323D;
+    --ink:#E8EAE5;
+    --ink-muted:#A2ABB6;
+    --ink-faint:#707A85;
+    --accent:#7FB8BE;
+    --accent-soft:#233336;
+    --highlight:#E0A85A;
+    --highlight-soft:#33291B;
+    --status-good:#7FC08F;
+    --status-good-soft:#20301F;
+    --status-watch:#E0B84F;
+    --status-watch-soft:#332C17;
+    --status-risk:#E08D77;
+    --status-risk-soft:#372220;
+    --rule:#333B45;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+  }
+
+  *{box-sizing:border-box;}
+  body{ background:var(--bg); margin:0; }
+  .page{
+    direction:rtl;
+    font-family:'Heebo', system-ui, sans-serif;
+    color:var(--ink);
+    max-width:920px;
+    margin:0 auto;
+    padding:56px 28px 96px;
+    line-height:1.6;
+  }
+  .num{ font-family:'IBM Plex Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+
+  /* ---------- Masthead ---------- */
+  .masthead{
+    padding-bottom:28px;
+    border-bottom:1px solid var(--rule);
+    margin-bottom:40px;
+  }
+  .masthead .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    letter-spacing:.06em;
+    color:var(--accent);
+    text-transform:uppercase;
+    margin:0 0 14px;
+  }
+  .masthead h1{
+    font-family:'Frank Ruhl Libre', serif;
+    font-weight:700;
+    font-size:clamp(32px,5vw,46px);
+    line-height:1.15;
+    margin:0 0 12px;
+    text-wrap:balance;
+  }
+  .masthead .sub{
+    font-size:17px;
+    color:var(--ink-muted);
+    max-width:62ch;
+    margin:0 0 22px;
+  }
+  .meta-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .meta-chip{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--ink-muted);
+    background:var(--surface-2);
+    border:1px solid var(--rule);
+    border-radius:100px;
+    padding:5px 12px;
+  }
+
+  /* ---------- Overview strip ---------- */
+  .overview{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:12px;
+    margin-bottom:56px;
+  }
+  @media (max-width:760px){ .overview{ grid-template-columns:repeat(2,1fr); } }
+  .ov-card{
+    background:var(--surface);
+    border:1px solid var(--rule);
+    border-radius:12px;
+    padding:16px 16px 18px;
+    box-shadow:var(--shadow);
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    min-height:150px;
+  }
+  .ov-top{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  .ov-name{ font-weight:700; font-size:15px; }
+  .pill{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:.02em;
+    padding:3px 9px;
+    border-radius:100px;
+    white-space:nowrap;
+  }
+  .pill.risk{ background:var(--status-risk-soft); color:var(--status-risk); }
+  .pill.watch{ background:var(--status-watch-soft); color:var(--status-watch); }
+  .pill.good{ background:var(--status-good-soft); color:var(--status-good); }
+  .ov-desc{ font-size:13.5px; color:var(--ink-muted); flex:1; }
+  .ov-risk{ font-size:12.5px; color:var(--ink); border-top:1px solid var(--rule); padding-top:9px; }
+  .ov-risk b{ color:var(--ink-muted); font-weight:600; }
+
+  /* ---------- Project sections ---------- */
+  .project{
+    padding:36px 0;
+    border-bottom:1px solid var(--rule);
+  }
+  .project:first-of-type{ padding-top:0; }
+  .project-head{ display:flex; align-items:baseline; justify-content:space-between; gap:16px; margin-bottom:6px; flex-wrap:wrap; }
+  .project-head h2{
+    font-family:'Frank Ruhl Libre', serif;
+    font-weight:700;
+    font-size:26px;
+    margin:0;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .project-period{ font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--ink-faint); }
+  .project-tagline{ color:var(--ink-muted); font-size:14.5px; margin:0 0 22px; max-width:56ch; }
+
+  .project-grid{
+    display:grid;
+    grid-template-columns:1.55fr 1fr;
+    gap:32px;
+    align-items:start;
+  }
+  @media (max-width:720px){ .project-grid{ grid-template-columns:1fr; } }
+
+  .block-label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin:0 0 10px;
+  }
+  .narrative p{ margin:0 0 16px; font-size:15px; }
+  .goal-list{ margin:0 0 22px; padding:0; list-style:none; }
+  .goal-list li{
+    position:relative;
+    padding-inline-start:18px;
+    margin-bottom:8px;
+    font-size:14.5px;
+  }
+  .goal-list li::before{
+    content:"";
+    position:absolute;
+    inset-inline-start:0;
+    top:9px;
+    width:6px; height:6px;
+    border-radius:50%;
+    background:var(--accent);
+  }
+
+  .side-panel{
+    background:var(--surface);
+    border:1px solid var(--rule);
+    border-radius:12px;
+    padding:18px 18px 20px;
+    box-shadow:var(--shadow);
+  }
+  .side-panel + .side-panel{ margin-top:14px; }
+
+  .kpi-row{ margin-bottom:16px; }
+  .kpi-row:last-child{ margin-bottom:0; }
+  .kpi-top{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px; gap:8px; }
+  .kpi-name{ font-size:13px; color:var(--ink-muted); }
+  .kpi-value{ font-size:13px; }
+  .kpi-value b{ font-size:16px; }
+  .kpi-value .of{ color:var(--ink-faint); }
+  .meter-track{ height:7px; border-radius:4px; background:var(--surface-3); overflow:hidden; }
+  .meter-fill{ height:100%; border-radius:4px; }
+  .fill-risk{ background:var(--status-risk); }
+  .fill-watch{ background:var(--status-watch); }
+  .fill-good{ background:var(--status-good); }
+
+  .shift-row{ display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+  .shift-row:last-child{ margin-bottom:0; }
+  .shift-chip{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    padding:5px 10px;
+    border-radius:8px;
+    background:var(--surface-2);
+    color:var(--ink-muted);
+  }
+  .shift-chip.now{ background:var(--status-watch-soft); color:var(--status-watch); font-weight:600; }
+  .shift-arrow{ color:var(--ink-faint); font-size:13px; }
+  .shift-label{ font-size:12.5px; color:var(--ink-faint); margin-bottom:8px; }
+
+  .risk-list{ margin:0; padding:0; list-style:none; }
+  .risk-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    gap:10px;
+    padding:9px 0;
+    border-top:1px solid var(--rule);
+    font-size:13.5px;
+  }
+  .risk-item:first-child{ border-top:none; padding-top:0; }
+  .risk-sev{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:.03em;
+    white-space:nowrap;
+    padding:2px 7px;
+    border-radius:100px;
+  }
+  .risk-sev.high{ background:var(--status-risk-soft); color:var(--status-risk); }
+  .risk-sev.mid{ background:var(--status-watch-soft); color:var(--status-watch); }
+
+  /* ---------- Pattern band ---------- */
+  .pattern-band{
+    background:var(--surface-2);
+    border-radius:16px;
+    padding:36px 32px;
+    margin:48px 0;
+  }
+  .pattern-band .block-label{ margin-bottom:8px; }
+  .pattern-band h3{
+    font-family:'Frank Ruhl Libre', serif;
+    font-size:24px;
+    font-weight:700;
+    margin:0 0 8px;
+    text-wrap:balance;
+  }
+  .pattern-band .intro{ color:var(--ink-muted); font-size:14.5px; max-width:62ch; margin:0 0 26px; }
+  .pattern-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:18px;
+  }
+  @media (max-width:720px){ .pattern-grid{ grid-template-columns:1fr; } }
+  .pattern-card{
+    background:var(--surface);
+    border-radius:10px;
+    padding:16px 16px 18px;
+    border:1px solid var(--rule);
+  }
+  .pattern-card h4{ font-size:15px; margin:0 0 8px; font-weight:700; }
+  .pattern-card p{ font-size:13.5px; color:var(--ink-muted); margin:0; }
+
+  /* ---------- Recommendation callout ---------- */
+  .callout{
+    border:1px solid var(--highlight);
+    background:var(--highlight-soft);
+    border-radius:14px;
+    padding:30px 32px;
+    margin-top:12px;
+  }
+  .callout .block-label{ color:var(--highlight); }
+  .callout h3{
+    font-family:'Frank Ruhl Libre', serif;
+    font-size:23px;
+    font-weight:700;
+    margin:0 0 14px;
+    text-wrap:balance;
+  }
+  .callout-grid{ display:grid; grid-template-columns:1fr 1fr; gap:26px; }
+  @media (max-width:720px){ .callout-grid{ grid-template-columns:1fr; } }
+  .callout-item h5{ margin:0 0 6px; font-size:14.5px; }
+  .callout-item p{ margin:0; font-size:14px; color:var(--ink-muted); }
+
+  /* ---------- Footer ---------- */
+  .footer{
+    margin-top:52px;
+    padding-top:20px;
+    border-top:1px solid var(--rule);
+    font-size:12.5px;
+    color:var(--ink-faint);
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+</style>
+
+<div class="page" dir="rtl" lang="he">
+
+  <div class="masthead">
+    <p class="eyebrow">בריף הנהלה · סקירת פורטפוליו</p>
+    <h1>רבעון ההחלטות</h1>
+    <p class="sub">ארבע יוזמות אסטרטגיות — Nova, Atlas, Horizon, Beacon — נבחנו לפי היעדים שהוגדרו להן, מה קרה בפועל, ואילו הכרעות הנהלה עדיין ממתינות.</p>
+    <div class="meta-row">
+      <span class="meta-chip">מרץ–יוני 2026</span>
+      <span class="meta-chip">4 פרויקטים</span>
+      <span class="meta-chip">13 מסמכי מקור</span>
+      <span class="meta-chip">הוכן ל-Super-Pharm ISRAEL</span>
+    </div>
+  </div>
+
+  <div class="overview">
+    <div class="ov-card">
+      <div class="ov-top"><span class="ov-name">Nova</span><span class="pill risk">בסיכון גבוה</span></div>
+      <p class="ov-desc">מוצר SaaS חדש כמנוע צמיחה — אמור להחליף את מודל הפרויקטים המותאמים ללקוח.</p>
+      <p class="ov-risk"><b>סיכון מרכזי · </b>דחיית MVP והיעדר בעלים ברור</p>
+    </div>
+    <div class="ov-card">
+      <div class="ov-top"><span class="ov-name">Atlas</span><span class="pill watch">בהתאוששות</span></div>
+      <p class="ov-desc">דשבורד הנהלה אחוד שיחליף דוחות אקסל נפרדים מכל מחלקה.</p>
+      <p class="ov-risk"><b>סיכון מרכזי · </b>נתונים לא מתוקפים בין מחלקות</p>
+    </div>
+    <div class="ov-card">
+      <div class="ov-top"><span class="ov-name">Horizon</span><span class="pill watch">מאט</span></div>
+      <p class="ov-desc">פורטל שירות עצמי שיצמצם פניות בסיסיות ללקוחות.</p>
+      <p class="ov-risk"><b>סיכון מרכזי · </b>אותו צוות פיתוח כמו Nova</p>
+    </div>
+    <div class="ov-card">
+      <div class="ov-top"><span class="ov-name">Beacon</span><span class="pill good">מתקדם בזהירות</span></div>
+      <p class="ov-desc">זיהוי מוקדם של לקוחות בסיכון נטישה, לטיפול יזום.</p>
+      <p class="ov-risk"><b>סיכון מרכזי · </b>יותר מדי אזעקות שווא</p>
+    </div>
+  </div>
+
+  <!-- ================= NOVA ================= -->
+  <section class="project">
+    <div class="project-head">
+      <h2>Nova <span class="pill risk">בסיכון גבוה</span></h2>
+      <span class="project-period">מרץ – אפריל 2026</span>
+    </div>
+    <p class="project-tagline">מנוע צמיחה חדש: הפיכת החברה ממודל פרויקטים מותאמים ללקוחות Enterprise למוצר דיגיטלי הניתן לסקייל.</p>
+
+    <div class="project-grid">
+      <div class="narrative">
+        <p class="block-label">יעדים אסטרטגיים</p>
+        <ul class="goal-list">
+          <li>גידול הכנסות החברה ב-25% תוך 12 חודשים</li>
+          <li>השקת MVP וגיוס 10 לקוחות פיילוט עד סוף רבעון 2</li>
+          <li>קיצור מחזור המכירה מ-90 ל-45 יום</li>
+          <li>שיפור שימור לקוחות ב-15%</li>
+        </ul>
+
+        <p class="block-label">הפער בין היעד לביצוע</p>
+        <p>נכון לדוח הסטטוס באפריל, אפיון המוצר הגיע ל-60% בלבד וגויס לקוח פיילוט אחד מתוך עשרה. באותן הפגישות עולות שוב ושוב אותן שתי שאלות בלי הכרעה — מיהו קהל היעד, ומי בעל הפרויקט. הלקוח האסטרטגי Alpha Logistics מוכן להתחיל "כבר החודש", אבל ממתין שבועות לתשובה.</p>
+      </div>
+
+      <div class="side-panel">
+        <p class="block-label">תמונת מצב מול היעד</p>
+
+        <div class="kpi-row">
+          <div class="kpi-top"><span class="kpi-name">אפיון מוצר</span><span class="kpi-value num"><b>60%</b> <span class="of">מתוך 100%</span></span></div>
+          <div class="meter-track"><div class="meter-fill fill-risk" style="width:60%"></div></div>
+        </div>
+
+        <div class="kpi-row">
+          <div class="kpi-top"><span class="kpi-name">לקוחות פיילוט</span><span class="kpi-value num"><b>1</b> <span class="of">מתוך 10</span></span></div>
+          <div class="meter-track"><div class="meter-fill fill-risk" style="width:10%"></div></div>
+        </div>
+
+        <div class="kpi-row">
+          <div class="kpi-top"><span class="kpi-name">ניצול תקציב שיווק</span><span class="kpi-value num"><b>32%</b></span></div>
+          <div class="meter-track"><div class="meter-fill fill-risk" style="width:32%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-panel" style="margin-top:22px;">
+      <p class="block-label">סיכונים מרכזיים</p>
+      <ul class="risk-list">
+        <li class="risk-item"><span>דחיית ה-MVP לרבעון הבא</span><span class="risk-sev high">הסתברות גבוהה</span></li>
+        <li class="risk-item"><span>היעדר בעלים ברור לפרויקט</span><span class="risk-sev high">הסתברות גבוהה</span></li>
+        <li class="risk-item"><span>פער מתרחב בין צוות המוצר לצוות המכירות</span><span class="risk-sev mid">הסתברות בינונית</span></li>
+        <li class="risk-item"><span>אובדן Alpha Logistics כלקוח עוגן</span><span class="risk-sev high">הסתברות גבוהה</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================= ATLAS ================= -->
+  <section class="project">
+    <div class="project-head">
+      <h2>Atlas <span class="pill watch">בהתאוששות</span></h2>
+      <span class="project-period">מאי 2026</span>
+    </div>
+    <p class="project-tagline">דשבורד הנהלה אחוד — מקור אמת יחיד למדדי החברה, במקום דוחות אקסל נפרדים מכל מחלקה.</p>
+
+    <div class="project-grid">
+      <div class="narrative">
+        <p class="block-label">יעדים אסטרטגיים</p>
+        <ul class="goal-list">
+          <li>דשבורד הנהלה יחיד: הכנסות, רווחיות, נטישה, סטטוס פרויקטים ותחזית רבעונית</li>
+          <li>הגדרות מדדים אחידות בין כספים, דאטה, מכירות ותפעול</li>
+          <li>ישיבת הנהלה חודשית שמתבססת על הדשבורד ולא על מצגות נפרדות</li>
+        </ul>
+
+        <p class="block-label">הפער בין היעד לביצוע</p>
+        <p>לוח הזמנים הראשוני התגלה כלא ריאלי כבר בפגישת ההתנעה. בפועל התגלו הגדרות "הכנסות" שונות בין מחלקות, נתוני CRM לא מעודכנים, וחיבור ל-ERP שנתקע באישור אבטחת מידע בלי SLA מוגדר. ההנהלה נאלצה לרדת מהשקה מלאה לגרסת "Preview" מצומצמת.</p>
+      </div>
+
+      <div class="side-panel">
+        <p class="block-label">שינוי תוכנית</p>
+        <div class="shift-row">
+          <span class="shift-label" style="display:none"></span>
+        </div>
+        <div class="shift-label">לוח זמנים להשקה</div>
+        <div class="shift-row">
+          <span class="shift-chip num">6 שבועות</span>
+          <span class="shift-arrow">←</span>
+          <span class="shift-chip now num">Preview באמצע יוני</span>
+        </div>
+        <div class="shift-label">היקף</div>
+        <div class="shift-row">
+          <span class="shift-chip">מערכת BI מלאה</span>
+          <span class="shift-arrow">←</span>
+          <span class="shift-chip now">3 שכבות מדדים, מאושר בלבד בשלב א׳</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-panel" style="margin-top:22px;">
+      <p class="block-label">סיכונים מרכזיים</p>
+      <ul class="risk-list">
+        <li class="risk-item"><span>דשבורד שמוצג על בסיס נתונים לא מתוקפים עלול להטעות</span><span class="risk-sev high">הסתברות גבוהה</span></li>
+        <li class="risk-item"><span>תלות גבוהה בזמינות סמנכ"לים לאישור הגדרות מדדים</span><span class="risk-sev mid">הסתברות בינונית</span></li>
+        <li class="risk-item"><span>תחרות משאבים מול Nova על אותם אנשי צוות</span><span class="risk-sev mid">הסתברות בינונית</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================= HORIZON ================= -->
+  <section class="project">
+    <div class="project-head">
+      <h2>Horizon <span class="pill watch">מאט</span></h2>
+      <span class="project-period">יוני 2026</span>
+    </div>
+    <p class="project-tagline">פורטל שירות עצמי ללקוחות — מסמכים, מעקב פניות וסטטוס, כדי לצמצם עומס פניות בסיסיות על הצוותים.</p>
+
+    <div class="project-grid">
+      <div class="narrative">
+        <p class="block-label">יעדים אסטרטגיים</p>
+        <ul class="goal-list">
+          <li>גרסה ראשונה שימושית תוך כשלושה חודשים</li>
+          <li>פיילוט עם 5 לקוחות נבחרים, שקיפות סביב פניות ומסמכים</li>
+          <li>הפחתת פניות שירות בסיסיות לנציגים</li>
+        </ul>
+
+        <p class="block-label">הפער בין היעד לביצוע</p>
+        <p>שבועיים אחרי המועד שנקבע לסגירת תוכנית העבודה, עדיין לא היה סקופ סופי. התגלה שנתוני מערכת השירות לא נקיים מספיק לחשיפה ללקוח, ושסוגיית ההרשאות בארגונות מרובי-משתמשים לא טופלה בהתנעה. הצוות המפתח משותף עם Nova — קונפליקט שהוכר בפגישה אך לא נפתר בהחלטת תיעדוף.</p>
+      </div>
+
+      <div class="side-panel">
+        <p class="block-label">שינוי תוכנית</p>
+        <div class="shift-label">מועד פיילוט</div>
+        <div class="shift-row">
+          <span class="shift-chip num">תחילת יולי</span>
+          <span class="shift-arrow">←</span>
+          <span class="shift-chip now num">סוף יולי, בלי פתיחת פנייה חדשה</span>
+        </div>
+        <div class="shift-label">מיצוב חוצה-לקוחות</div>
+        <div class="shift-row">
+          <span class="shift-chip">"פורטל לקוחות חדש"</span>
+          <span class="shift-arrow">←</span>
+          <span class="shift-chip now">"תוכנית בטא לשירות עצמי"</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-panel" style="margin-top:22px;">
+      <p class="block-label">סיכונים מרכזיים</p>
+      <ul class="risk-list">
+        <li class="risk-item"><span>פגיעה באמון אם הפורטל יציג סטטוסים לא מעודכנים</span><span class="risk-sev high">הסתברות גבוהה</span></li>
+        <li class="risk-item"><span>היעדר תיעדוף רשמי מול Nova על אותם משאבי פיתוח</span><span class="risk-sev high">הסתברות גבוהה</span></li>
+        <li class="risk-item"><span>אבטחת מידע לא מאשרת יציאה בלי מסמך הרשאות מלא</span><span class="risk-sev mid">הסתברות בינונית</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================= BEACON ================= -->
+  <section class="project" style="border-bottom:none;">
+    <div class="project-head">
+      <h2>Beacon <span class="pill good">מתקדם בזהירות</span></h2>
+      <span class="project-period">יוני 2026</span>
+    </div>
+    <p class="project-tagline">זיהוי מוקדם של לקוחות בסיכון נטישה, כדי שמנהלי לקוחות יטפלו בזמן — לא עוד "רגש בטן" בלבד.</p>
+
+    <div class="project-grid">
+      <div class="narrative">
+        <p class="block-label">יעדים אסטרטגיים</p>
+        <ul class="goal-list">
+          <li>כלי עבודה פנימי ל-Customer Success, לא כלי תחזית מכירות</li>
+          <li>דירוג סיכון אמין שמאפשר התמקדות ולא רק "רעש"</li>
+          <li>הפעלה בתוך חודש, עם מדידה של פעולה בפועל ולא רק דיוק המודל</li>
+        </ul>
+
+        <p class="block-label">הפער בין היעד לביצוע</p>
+        <p>הגרסה הראשונית של המודל סימנה יותר מדי לקוחות כ"בסיכון" — מתוך 42 שסומנו בסיכון גבוה, רק 11 הראו סימני נטישה אמיתיים. ההנהלה בחרה בפתרון פרגמטי: תיוג ידני של מנהלי לקוחות, רשימה שבועית באקסל במקום אוטומציה מלאה, ושינוי שם ל"מעקב מוגבר" כדי להימנע מתדמית מאיימת.</p>
+      </div>
+
+      <div class="side-panel">
+        <p class="block-label">דיוק ההתראות (פיילוט ראשוני)</p>
+        <div class="kpi-row">
+          <div class="kpi-top"><span class="kpi-name">אישור נטישה בפועל</span><span class="kpi-value num"><b>11</b> <span class="of">מתוך 42 שסומנו</span></span></div>
+          <div class="meter-track"><div class="meter-fill fill-risk" style="width:26%"></div></div>
+        </div>
+        <p style="font-size:12.5px;color:var(--ink-faint);margin:10px 0 0;">כ-26% דיוק — שיעור אזעקות שווא גבוה, בטיפול לפני הרחבה.</p>
+      </div>
+    </div>
+
+    <div class="side-panel" style="margin-top:22px;">
+      <p class="block-label">סיכונים מרכזיים</p>
+      <ul class="risk-list">
+        <li class="risk-item"><span>אזעקות שווא רבות יגרמו לצוותים להתעלם מהתראות</span><span class="risk-sev high">הסתברות גבוהה</span></li>
+        <li class="risk-item"><span>מידע קריטי מהשטח (הערות שירות חופשיות) לא מנוצל</span><span class="risk-sev mid">הסתברות בינונית</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================= PATTERN BAND ================= -->
+  <div class="pattern-band">
+    <p class="block-label">ניתוח חוצה-פרויקטים</p>
+    <h3>שלוש התקלות שחוזרות בכל הארבעה</h3>
+    <p class="intro">בלי קשר לתחום — מוצר, דאטה, שירות או דאטה-סיינס — אותם שלושה דפוסים חוזרים בכל פרויקט, וזה החלק החשוב מכל מסמך בודד.</p>
+    <div class="pattern-grid">
+      <div class="pattern-card">
+        <h4>בעלות מוגדרת בדיעבד</h4>
+        <p>בכל אחד מהפרויקטים לא היה, בשלב ההתנעה, גורם יחיד עם סמכות הכרעה. הבעלות מתמנה רק אחרי עיכוב — כתגובה, לא כמנגנון.</p>
+      </div>
+      <div class="pattern-card">
+        <h4>תחרות משאבים סמויה</h4>
+        <p>Nova, Atlas ו-Horizon מתחרים על אותם אנשי מוצר ופיתוח בלי תיעדוף רשמי בין הפרויקטים — הקונפליקט מוזכר בפגישות אך לא מוכרע בהנהלה.</p>
+      </div>
+      <div class="pattern-card">
+        <h4>לוחות זמנים אופטימיים מדי</h4>
+        <p>בארבעת הפרויקטים לוח הזמנים הראשוני התברר כלא ריאלי מול המורכבות התפעולית האמיתית, וגרר תיקון היקף באמצע הדרך.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= RECOMMENDATION ================= -->
+  <div class="callout">
+    <p class="block-label">המלצת הנהלה</p>
+    <h3>לנעול את ההזדמנות עם Alpha Logistics, ולבנות מנגנון תיעדוף לפני הפרויקט הבא</h3>
+    <div class="callout-grid">
+      <div class="callout-item">
+        <h5>דחוף · הזדמנות שעל סף אובדן</h5>
+        <p>Alpha Logistics מוכנה להיות לקוח עוגן ל-Nova ומחכה שבועות לתשובה. במקביל, 6 לקוחות קיימים ביקשו הדגמה מוקדמת (Upsell) ו-TechBridge הציעה שותפות שמקצרת Time to Market. שלושתן ממתינות להחלטת הנהלה שלא מתקבלת.</p>
+      </div>
+      <div class="callout-item">
+        <h5>מבני · תיעדוף חוצה-פרויקטים</h5>
+        <p>הפתרון החוזר ("נמנה Owner", "נסכם בפגישה הבאה") לא מספיק — הוא נעשה בכל פרויקט בנפרד ותמיד באיחור. דרוש מנגנון הנהלה יחיד שממנה בעלים כבר בהתנעה ומכריע קונפליקטי משאבים בין הפרויקטים באופן שוטף, לא רק כשכבר נוצר עיכוב.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>מבוסס על 13 מסמכים: מסמכי אסטרטגיה, סיכומי הנהלה, דוח סטטוס ותמלולי פגישות · מרץ–יוני 2026</span>
+    <span>הוכן עבור gil tzipori · Super-Pharm ISRAEL</span>
+  </div>
+
+</div>
