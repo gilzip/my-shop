@@ -27,8 +27,9 @@ This project was generated with `@vendure/create`.
 
 ## Commands
 
-- Start development: `npm run dev`
+- Start development: `npm run dev` (server, worker and the dashboard at `http://localhost:3000/dashboard`)
 - Build: `npm run build`
+- `npm run dev:server` and `npm run start:server` do not build the dashboard. Without a build, `/dashboard` shows only a "Build your dashboard" placeholder. Run `npm run build:dashboard` once (output in `dist/dashboard`, gitignored); it also regenerates `src/gql/graphql-env.d.ts`.
 - Unit tests: `npm test`
 
 ## Quality Checks
